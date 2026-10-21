@@ -276,6 +276,12 @@ textarea:focus,.f input:focus,.f select:focus{border-color:var(--red)}
 .item h4{font-size:1.05rem;letter-spacing:.01em}
 .price{color:var(--red)}
 @media(max-width:860px){.hero-in{grid-template-columns:1fr;text-align:left}.hero p{margin-inline:0}.hero .ctas,.badges{justify-content:flex-start}.feat{transform:none}.how-l{grid-template-columns:1fr}}
+
+/* modal: rolagem e X fixo */
+.ov{touch-action:auto}
+.sheet{-webkit-overflow-scrolling:touch}
+.toast{top:auto!important;bottom:96px}
+.sheet>.x{position:sticky;top:12px;right:auto;margin:12px 12px -52px auto;display:grid;place-items:center;z-index:6;box-shadow:0 4px 14px rgba(0,0,0,.28)}
 </style>
 </head>
 <body>
@@ -477,6 +483,13 @@ renderCart();
 let fsz=0;const FS=[['P · 400 g',0],['M · 700 g',5],['G · 1 kg',10]];$$('#sizes button').forEach(b=>b.onclick=()=>{fsz=+b.dataset.i;$$('#sizes button').forEach(x=>x.classList.toggle('on',x===b))});$('#featAdd').onclick=()=>{cart.push({name:'Macarrão na chapa',unit:15+FS[fsz][1],qty:1,opts:['tamanho: '+FS[fsz][0]],obs:''});saveCart();renderCart();toast('✓ Macarrão na chapa '+FS[fsz][0].split(' ')[0]+' no pedido');const cb=$('#cartBtn');cb.classList.remove('bump');void cb.offsetWidth;cb.classList.add('bump')};
 
 })();
+
+/* modal: rolagem com mouse/dedo, X sempre visível, botão voltar do celular fecha */
+(()=>{const fx=sh=>{const x=sh.querySelector('.x');if(x&&x.parentElement!==sh)sh.prepend(x)};
+let pushed=false,skip=false;const anyOpen=()=>document.querySelector('.ov.show');
+document.querySelectorAll('.ov').forEach(ov=>{ov.setAttribute('data-lenis-prevent','');const sh=ov.querySelector('.sheet');if(sh){fx(sh);new MutationObserver(()=>fx(sh)).observe(sh,{childList:true})}
+ new MutationObserver(()=>{if(anyOpen()){if(!pushed){try{history.pushState({ov:1},'');pushed=true}catch(e){}}}else if(pushed){setTimeout(()=>{if(!anyOpen()&&pushed){pushed=false;skip=true;history.back()}},60)}}).observe(ov,{attributes:true,attributeFilter:['class']})});
+addEventListener('popstate',()=>{if(skip){skip=false;return}if(pushed){pushed=false;const o=anyOpen();if(o)o.dispatchEvent(new MouseEvent('click',{bubbles:true}))}})})();
 </script>
 </body>
 </html>
